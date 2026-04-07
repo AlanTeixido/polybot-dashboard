@@ -12,7 +12,7 @@ function headers(): HeadersInit {
 export async function getAgentInfo(): Promise<AgentInfo> {
   const res = await fetch(`${SIMMER_API}/agents/me`, {
     headers: headers(),
-    next: { revalidate: 60 },
+    cache: "no-store",
   });
   if (!res.ok) throw new Error(`Simmer /agents/me failed: ${res.status}`);
   const data = await res.json();
@@ -25,7 +25,7 @@ export async function getAgentInfo(): Promise<AgentInfo> {
 export async function getPositions(): Promise<Position[]> {
   const res = await fetch(`${SIMMER_API}/positions`, {
     headers: headers(),
-    next: { revalidate: 60 },
+    cache: "no-store",
   });
   if (!res.ok) return [];
   const data = await res.json();
@@ -59,7 +59,7 @@ export async function getPositions(): Promise<Position[]> {
 export async function getOpportunities(): Promise<Market[]> {
   const res = await fetch(`${SIMMER_API}/markets/opportunities?limit=10`, {
     headers: headers(),
-    next: { revalidate: 60 },
+    cache: "no-store",
   });
   if (!res.ok) return [];
   const data = await res.json();

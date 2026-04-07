@@ -6,7 +6,7 @@ import { BalanceChart } from "@/components/balance-chart";
 import { WinRateRing } from "@/components/win-rate-ring";
 import { CategoryBars } from "@/components/category-bars";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 function formatPnl(value: number): string {
   const sign = value >= 0 ? "+" : "";

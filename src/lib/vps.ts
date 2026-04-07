@@ -11,7 +11,7 @@ export async function getTrades(): Promise<Trade[]> {
   try {
     const res = await fetch(`${VPS_URL}/api/trades`, {
       headers: headers(),
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!res.ok) return [];
     return await res.json();
@@ -27,7 +27,7 @@ export async function getStats(): Promise<{
   try {
     const res = await fetch(`${VPS_URL}/api/stats`, {
       headers: headers(),
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!res.ok)
       return {
@@ -44,7 +44,7 @@ export async function getBalanceHistory(): Promise<BalanceSnapshot[]> {
   try {
     const res = await fetch(`${VPS_URL}/api/balance-history`, {
       headers: headers(),
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
     if (!res.ok) return [];
     return await res.json();
