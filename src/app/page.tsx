@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getAgentInfo, getPositions, getOpportunities } from "@/lib/simmer";
 import { getTrades, getStats, getBalanceHistory } from "@/lib/vps";
 import { AutoRefresh } from "@/components/auto-refresh";
@@ -61,13 +62,22 @@ export default async function Dashboard() {
     <main className="relative z-1 mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
       {/* Header */}
       <header className="mb-8 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-baseline gap-3">
-          <h1 className="text-2xl font-bold tracking-tight text-white/95">
-            POLYBOT
-          </h1>
-          <span className="font-mono text-sm text-white/25">
-            {agent.name ?? "agent"}
-          </span>
+        <div className="flex items-center gap-3">
+          <Image
+            src="/logo.svg"
+            alt="AT"
+            width={36}
+            height={36}
+            className="rounded-lg"
+          />
+          <div className="flex items-baseline gap-2">
+            <h1 className="text-2xl font-bold tracking-tight text-white/95">
+              POLYBOT
+            </h1>
+            <span className="font-mono text-sm text-white/25">
+              {agent.name ?? "agent"}
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-5">
           <div className="text-right">

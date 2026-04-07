@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Polybot Dashboard",
   description: "Autonomous trading bot dashboard for Simmer/Polymarket",
+  icons: { icon: "/logo.svg" },
 };
 
 export default function RootLayout({
