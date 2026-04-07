@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { getAgentInfo, getPositions, getOpportunities } from "@/lib/simmer";
+import { getAgentInfo, getPositionsData, getOpportunities } from "@/lib/simmer";
 import { getTrades, getStats, getBalanceHistory } from "@/lib/vps";
 import { AutoRefresh } from "@/components/auto-refresh";
 import { BalanceChart } from "@/components/balance-chart";
@@ -28,10 +28,16 @@ function streakLabel(streak: number): string {
 }
 
 export default async function Dashboard() {
-  const [agent, positions, opportunities, trades, statsData, balanceHistory] =
+  const [agent, posData, opportunities, trades, statsData, balanceHistory] =
     await Promise.all([
       getAgentInfo().catch(() => ({ balance: 0, name: "Polybot" })),
-      getPositions().catch(() => []),
+      getPositionsData().catch(() => ({
+        positions: [],
+        pnl: { realized: 0, unrealized: 0, total: 0 },
+        totalValue: 0,
+        activeCount: 0,
+        resolvedCount: 0,
+      })),
       getOpportunities().catch(() => []),
       getTrades().catch(() => []),
       getStats().catch(() => ({
@@ -51,12 +57,14 @@ export default async function Dashboard() {
       getBalanceHistory().catch(() => []),
     ]);
 
+  const { positions, pnl: simmerPnl } = posData;
   const { stats, categories } = statsData;
   const recentTrades = trades.slice(0, 20);
-  const totalUnrealizedPnl = positions.reduce(
-    (sum, p) => sum + p.unrealized_pnl,
-    0
-  );
+
+  // Use Simmer PnL if available, fallback to VPS stats
+  const totalPnl = simmerPnl.total !== 0 ? simmerPnl.total : stats.total_pnl;
+  const unrealizedPnl = simmerPnl.unrealized;
+  const realizedPnl = simmerPnl.realized;
 
   return (
     <main className="relative z-1 mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
@@ -100,11 +108,24 @@ export default async function Dashboard() {
             PnL Total
           </div>
           <div
-            className={`stat-value ${stats.total_pnl >= 0 ? "pnl-positive glow-cyan" : "pnl-negative glow-red"}`}
+            className={`stat-value ${totalPnl >= 0 ? "pnl-positive glow-cyan" : "pnl-negative glow-red"}`}
           >
-            {formatPnl(stats.total_pnl)}
+            {formatPnl(totalPnl)}
           </div>
-          <div className="mt-1 text-[10px] text-white/20">$SIM realized</div>
+          <div className="mt-1.5 flex items-center gap-3 text-[10px]">
+            <span className="text-white/20">
+              realized:{" "}
+              <span className={realizedPnl >= 0 ? "text-cyan-400/60" : "text-red-400/60"}>
+                {formatPnl(realizedPnl)}
+              </span>
+            </span>
+            <span className="text-white/20">
+              unrealized:{" "}
+              <span className={unrealizedPnl >= 0 ? "text-cyan-400/60" : "text-red-400/60"}>
+                {formatPnl(unrealizedPnl)}
+              </span>
+            </span>
+          </div>
         </div>
 
         {/* Win Rate Ring */}
@@ -112,16 +133,18 @@ export default async function Dashboard() {
           <WinRateRing rate={stats.win_rate} />
         </div>
 
-        {/* Trades */}
+        {/* Trades / Positions */}
         <div className="card stat-card-purple">
           <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-white/30">
-            Trades
+            Positions
           </div>
           <div className="stat-value text-white">
-            {stats.resolved_trades}
-            <span className="text-lg text-white/25">/{stats.total_trades}</span>
+            {posData.activeCount}
+            <span className="text-lg text-white/25"> active</span>
           </div>
-          <div className="mt-1 text-[10px] text-white/20">resolved/total</div>
+          <div className="mt-1 text-[10px] text-white/20">
+            {posData.resolvedCount} resolved / value: {posData.totalValue.toFixed(0)} $SIM
+          </div>
         </div>
 
         {/* Streak */}
@@ -174,10 +197,10 @@ export default async function Dashboard() {
               unrealized:{" "}
               <span
                 className={
-                  totalUnrealizedPnl >= 0 ? "pnl-positive" : "pnl-negative"
+                  unrealizedPnl >= 0 ? "pnl-positive" : "pnl-negative"
                 }
               >
-                {formatPnl(totalUnrealizedPnl)}
+                {formatPnl(unrealizedPnl)}
               </span>
             </span>
           )}

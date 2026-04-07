@@ -65,3 +65,17 @@ export interface BalanceSnapshot {
   balance: number;
   date: string;
 }
+
+export interface PnlSummary {
+  realized: number;
+  unrealized: number;
+  total: number;
+}
+
+export interface PositionsData {
+  positions: Position[];
+  pnl: PnlSummary;
+  totalValue: number;
+  activeCount: number;
+  resolvedCount: number;
+}
